@@ -1,6 +1,8 @@
 ---
 title: "GMM & IV"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 One big problem that we often face in regression analysis is **endogeneity**. That pesky violation of assumption 4.  An endogenous variable is one that is correlated with $u_i$. There are *multiple* ways of which endogeneity may be present, here are just a few:
@@ -371,7 +373,7 @@ Here is the [description](http://fmwww.bc.edu/ec-p/data/wooldridge/labsup.des) o
 ```{r}
 library(dplyr)
 
-labsup <- read.csv('/Users/mkaltenberg/Dropbox/Pace/ECO585/R notebooks/Data/labsup.csv')
+labsup <- read.csv('C:/Users/Gabrielle Martinez/Documents/eco585 econometrics/Data/labsup.csv')
 
 selected_lab <-select(labsup, hours, samesex, kidcount)
 
@@ -432,19 +434,23 @@ A binary indicator, $n e a r c 4_{i}$, equal to one if the man was near a four-y
  
 ```{r}
 library(wooldridge)
+library(lmtest)
 data(card)
+
 
 summary(select(card, educ, nearc4))
  
 card_ols<- lm(educ ~ nearc4, card)
 
-coeftest(card_ds, vcov = vcovHC(card_ols, type="HC0"))
+coeftest(card_ols, vcov. = vcovHC(card_ols, type="HC0"))
 ```
 educ and nearc4 are strongly enough related: being near a 4-year college
 increases educ by almost a year. t statistic is pretty large.
 
 ```{r, results='asis'}
+# install.packages("lmtest")
 library(stargazer)
+# library(lmtest)
 card_iv <-ivreg(lwage ~ educ | nearc4 , data = card)
 card_iv <- robust.se(card_iv)
 
@@ -508,6 +514,8 @@ in an SMSA (both currently and at age 16), and living in the south (currently). 
 ```{r}
 card_ols_full <-lm(lwage ~ educ+nearc4+ exper+ expersq+ black+ smsa+ south+ smsa66+ reg662:reg669, data = card)
 
+library(sos)
+
 coeftest(card_ols_full, vcov = vcovHC(card_ols_full, type="HC1"))
 
 ```
@@ -526,7 +534,7 @@ stargazer(card_ols_full, card_iv_full, type = "html",
 
 Discrepancy is smaller now, but still large: 13.2% for IV, 7.5% for OLS.
 
-#Simultaneous Causality Example
+# Simultaneous Causality Example
 Simultaneous equation Model of Market Equilibrium
 
 Research question: What is the extent of price sensitivity of the demand for butter?
