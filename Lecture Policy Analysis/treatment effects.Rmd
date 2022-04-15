@@ -667,6 +667,16 @@ lapply(ecls_cov, function(v) {
     t.test(ecls[, v] ~ ecls[, 'catholic'])
 })
 ```
+```{r}
+# welch<-c()
+# for(x in ecls_cov){
+#   welch <-  t.test(ecls[, x] ~ ecls[, 'catholic'])
+# }
+# 
+# for(i in welch){
+#   print(i)
+# }
+```
 
 Ok, let's do the PSM
 
@@ -685,7 +695,7 @@ Here, we're going to run the logit model to *predict* the liklihood of being in 
 ```{r}
 ecls <- ecls %>% mutate(w3income_1k = w3income / 1000)
 #we'll divide income by 1000 to have "lower numbers", just remember this in the interpretation. It helps deal with potential heteroskedasticity issues.
-m_ps <- glm(catholic ~ race_white + w3income_1k + p5hmage + p5numpla + w3momed_hsb,
+m_ps <- glm(catholic ~ race_white + log(w3income_1k) + p5hmage + p5numpla + w3momed_hsb,
             family = binomial(), data = ecls)
 summary(m_ps)
 ```
@@ -697,6 +707,7 @@ Now - we calculate the propensity score for each student. That's just the predic
 prs_df <- data.frame(pr_score = predict(m_ps, type = "response"),
                      catholic = m_ps$model$catholic)
 head(prs_df)
+
 ```
 
 
